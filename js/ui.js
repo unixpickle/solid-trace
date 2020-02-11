@@ -35,32 +35,7 @@ class UserInterface {
 
     showExample() {
         const name = this.exampleSelect.value;
-        const codes = {
-            'sphere': '(x, y, z) => {\n  return x*x + y*y + z*z < 1;\n}',
-            'hole-box': '(x, y, z) => {\n' +
-                '  if (Math.abs(x) > 1 || Math.abs(y) > 1 || Math.abs(z) > 1) {\n' +
-                '    return false;\n' +
-                '  }\n' +
-                '  return x*x + z*z > 0.1;\n' +
-                '}',
-            'corner-cut': `(x, y, z) => {
-  if (Math.abs(x) > 1 || Math.abs(y) > 1 || Math.abs(z) > 1) {
-    return false;
-  }
-  let cutOff = false;
-  [-1, 1].forEach((cx) => {
-    [-1, 1].forEach((cy) => {
-      [-1, 1].forEach((cz) => {
-        if (Math.pow(x-cx, 2) + Math.pow(y-cy, 2) + Math.pow(z-cz, 2) < 0.4) {
-        cutOff = true;
-        }
-      });
-    });
-  });
-  return !cutOff;
-}`,
-        };
-        this.solidCode.value = codes[name];
+        this.solidCode.value = EXAMPLE_CODES[name];
         this.render();
     }
 
