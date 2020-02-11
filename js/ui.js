@@ -20,7 +20,13 @@ class UserInterface {
         if (this.rayTracer !== null) {
             this.rayTracer.cancel();
         }
-        const rawSolidFunc = eval(this.solidCode.value);
+        let rawSolidFunc;
+        try {
+            rawSolidFunc = eval(this.solidCode.value);
+        } catch (e) {
+            alert('Failed to parse code: ' + e);
+            return;
+        }
         const solidFunc = (v) => {
             const v1 = this.rotationMatrix.transpose().apply(v);
             if (v1.maxAbs() > 1) {
