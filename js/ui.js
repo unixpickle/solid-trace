@@ -11,6 +11,7 @@ class UserInterface {
         this.renderButton.addEventListener('click', () => this.render());
 
         this._setupMouseEvents();
+        this._setupTouchEvents();
 
         this.showExample();
     }
@@ -42,24 +43,53 @@ class UserInterface {
                 '  }\n' +
                 '  return x*x + z*z > 0.1;\n' +
                 '}',
+            'corner-cut': `(x, y, z) => {
+  if (Math.abs(x) > 1 || Math.abs(y) > 1 || Math.abs(z) > 1) {
+    return false;
+  }
+  let cutOff = false;
+  [-1, 1].forEach((cx) => {
+    [-1, 1].forEach((cy) => {
+      [-1, 1].forEach((cz) => {
+        if (Math.pow(x-cx, 2) + Math.pow(y-cy, 2) + Math.pow(z-cz, 2) < 0.4) {
+        cutOff = true;
         }
+      });
+    });
+  });
+  return !cutOff;
+}`,
+        };
         this.solidCode.value = codes[name];
         this.render();
     }
 
     _setupMouseEvents() {
+        this._setupMovementEvents('mousedown', 'mousemove', 'mouseup');
+    }
+
+    _setupTouchEvents() {
+        this._setupMovementEvents('touchstart', 'touchmove', 'touchend');
+    }
+
+    _setupMovementEvents(start, move, end) {
         const eventCoord = (e) => {
             const bounds = this.canvas.getBoundingClientRect();
+            if (start == 'touchstart') {
+                e = e.touches[0];
+            }
             return [e.clientX - bounds.left, e.clientY - bounds.top];
         }
-        this.canvas.addEventListener('mousedown', (e) => {
+        this.canvas.addEventListener(start, (e) => {
+            e.preventDefault();
+
             const startCoord = eventCoord(e);
             const startRotation = this.rotationMatrix;
 
             let moveHandler, upHandler;
             const cancelEvents = () => {
-                window.removeEventListener('mousemove', moveHandler);
-                window.removeEventListener('mouseup', upHandler);
+                window.removeEventListener(move, moveHandler);
+                window.removeEventListener(end, upHandler);
             };
             moveHandler = (e) => {
                 const newCoord = eventCoord(e);
@@ -76,9 +106,9 @@ class UserInterface {
                 this.render();
             };
             upHandler = cancelEvents;
-            window.addEventListener('mousemove', moveHandler);
-            window.addEventListener('mouseup', upHandler);
-        })
+            window.addEventListener(move, moveHandler);
+            window.addEventListener(end, upHandler);
+        });
     }
 }
 
