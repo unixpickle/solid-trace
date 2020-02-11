@@ -1,4 +1,7 @@
 const BISECTION_COUNT = 32;
+const FAST_RENDER_SUBSAMPLE = 5;
+const RENDER_INTERVAL = 5;
+const RENDER_CPU = 0.5;
 
 class RayTracer {
     constructor(canvas, solidFunc, epsilon, normalEpsilon, originY, solidRadius) {
@@ -25,28 +28,67 @@ class RayTracer {
             this.pixels[i] = this.pixels[j]
             this.pixels[j] = backup;
         }
+
+        this.renderInterval = null;
+    }
+
+    renderFast() {
+        const ctx = this.canvas.getContext('2d');
+        const data = ctx.createImageData(this.width, this.height);
+        for (let i = 0; i < this.height; i += FAST_RENDER_SUBSAMPLE) {
+            for (let j = 0; j < this.width; j += FAST_RENDER_SUBSAMPLE) {
+                const ray = this._pixelCoordToRay(j + FAST_RENDER_SUBSAMPLE / 2,
+                    i + FAST_RENDER_SUBSAMPLE / 2);
+                const brightness = this._rayBrightness(ray);
+                for (let y = 0; y < FAST_RENDER_SUBSAMPLE; y++) {
+                    for (let x = 0; x < FAST_RENDER_SUBSAMPLE; x++) {
+                        const idx = 4 * (x + j + (y + i) * this.width);
+                        data.data[idx + 3] = 255;
+                        for (let i = 0; i < 3; i++) {
+                            data.data[idx + i] = brightness;
+                        }
+                    }
+                }
+            }
+        }
+        ctx.putImageData(data, 0, 0);
     }
 
     render() {
-        const ctx = this.canvas.getContext('2d');
-        const data = ctx.createImageData(this.width, this.height);
-        this.pixels.forEach((coord) => {
-            const idx = 4 * (coord[1] * this.width + coord[0]);
-            data.data[idx + 3] = 255;
+        this.cancel();
+        let pixelIdx = 0;
+        this.renderInterval = setInterval(() => {
+            const startTime = new Date().getTime();
+            const ctx = this.canvas.getContext('2d');
+            const data = ctx.getImageData(0, 0, this.width, this.height);
+            while (pixelIdx < this.pixels.length) {
+                const coord = this.pixels[pixelIdx];
+                const ray = this._pixelCoordToRay(coord[0], coord[1]);
+                const brightness = this._rayBrightness(ray);
+                const idx = 4 * (coord[0] + coord[1] * this.width);
+                data.data[idx + 3] = 255;
+                for (let i = 0; i < 3; i++) {
+                    data.data[idx + i] = brightness;
+                }
+                pixelIdx++;
 
-            const ray = this._pixelCoordToRay(coord[0], coord[1]);
-            const point = this._rayCollision(ray);
-            if (!point) {
-                return;
+                // Prevent too much blocking of the main thread.
+                if (new Date().getTime() - startTime > RENDER_INTERVAL * RENDER_CPU) {
+                    break;
+                }
             }
-            const normal = this._surfaceNormal(point);
-            const lightDirection = point.sub(ray.origin).normalize();
-            const brightness = Math.max(0, -Math.round(255 * normal.dot(lightDirection)));
-            for (let i = 0; i < 3; i++) {
-                data.data[idx + i] = brightness;
+            if (pixelIdx === this.pixels.length) {
+                clearInterval(this.renderInterval);
             }
-        });
-        ctx.putImageData(data, 0, 0);
+            ctx.putImageData(data, 0, 0);
+        }, this.renderInterval);
+    }
+
+    cancel() {
+        if (this.renderInterval !== null) {
+            clearInterval(this.renderInterval);
+            this.renderInterval = null;
+        }
     }
 
     _pixelCoordToRay(x, y) {
@@ -54,6 +96,16 @@ class RayTracer {
         const xDist = (x - this.width / 2) / divider;
         const zDist = (y - this.height / 2) / divider;
         return new Ray(new Vec3(0, this.originY, 0), new Vec3(xDist, 1, zDist));
+    }
+
+    _rayBrightness(ray) {
+        const point = this._rayCollision(ray);
+        if (!point) {
+            return 0;
+        }
+        const normal = this._surfaceNormal(point);
+        const lightDirection = point.sub(ray.origin).normalize();
+        return Math.max(0, -Math.round(255 * normal.dot(lightDirection)));
     }
 
     _rayCollision(ray) {
