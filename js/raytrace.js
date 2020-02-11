@@ -1,18 +1,17 @@
 const BISECTION_COUNT = 32;
 const FAST_RENDER_SUBSAMPLE = 5;
-const RENDER_INTERVAL = 5;
+const RENDER_INTERVAL = 30;
 const RENDER_CPU = 0.5;
 const TIME_CHECK_INTERVAL = 100;
 
 class RayTracer {
-    constructor(canvas, solidFunc, epsilon, normalEpsilon, originY, solidBound) {
+    constructor(canvas, solidFunc, epsilon, normalEpsilon, originY, solidRadius) {
         this.canvas = canvas;
         this.solidFunc = solidFunc;
         this.epsilon = epsilon;
         this.normalEpsilon = normalEpsilon;
         this.originY = originY || -3;
-        this.solidBound = solidBound || 1;
-        this.solidRadius = this.solidBound * Math.sqrt(3);
+        this.solidRadius = solidRadius || Math.sqrt(3);
 
         this.width = canvas.width;
         this.height = canvas.height;
@@ -188,8 +187,7 @@ class RayTracer {
     }
 
     _contains(coord) {
-        return coord.maxAbs() < this.solidBound &&
-            this.solidFunc(coord.x, coord.y, coord.z);
+        return coord.norm() < this.solidRadius && this.solidFunc(coord);
     }
 }
 
