@@ -1,14 +1,18 @@
 class UserInterface {
     constructor() {
+        this.exampleSelect = document.getElementById('example-select');
         this.solidCode = document.getElementById('solid-code');
         this.renderButton = document.getElementById('render-button');
         this.canvas = document.getElementById('rendering');
         this.rayTracer = null;
         this.rotationMatrix = Mat3.identity();
 
+        this.exampleSelect.addEventListener('change', () => this.showExample());
         this.renderButton.addEventListener('click', () => this.render());
 
         this._setupMouseEvents();
+
+        this.showExample();
     }
 
     render() {
@@ -26,6 +30,21 @@ class UserInterface {
         this.rayTracer = new RayTracer(this.canvas, solidFunc, 0.01, 0.00001);
         this.rayTracer.renderFast();
         this.rayTracer.render();
+    }
+
+    showExample() {
+        const name = this.exampleSelect.value;
+        const codes = {
+            'sphere': '(x, y, z) => {\n  return x*x + y*y + z*z < 1;\n}',
+            'hole-box': '(x, y, z) => {\n' +
+                '  if (Math.abs(x) > 1 || Math.abs(y) > 1 || Math.abs(z) > 1) {\n' +
+                '    return false;\n' +
+                '  }\n' +
+                '  return x*x + z*z > 0.1;\n' +
+                '}',
+        }
+        this.solidCode.value = codes[name];
+        this.render();
     }
 
     _setupMouseEvents() {

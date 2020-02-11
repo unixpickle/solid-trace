@@ -4,10 +4,17 @@
         <link rel="stylesheet" href="css/style.css" type="text/css">
     </head>
     <body>
+        <div id="example-container">
+            <label>Example: </label>
+            <select id="example-select">
+                <option value="sphere" selected>Sphere</option>
+                <option value="hole-box">Hole Box</option>
+            </select>
+        </div>
         <div id="container">
             <div id="code-and-rendering">
                 <div id="code-area">
-                    <textarea id="solid-code">(x,y,z) => x+y+z &gt; 1</textarea>
+                    <textarea id="solid-code"></textarea>
                     <button id="render-button">Render</button>
                 </div>
                 <canvas id="rendering" width="300" height="300">
