@@ -45,4 +45,11 @@ class Vec3 {
             this.x * v1.y - this.y * v1.x,
         );
     }
+
+    maxAbs() {
+        const x = Math.abs(this.x);
+        const y = Math.abs(this.y);
+        const z = Math.abs(this.z);
+        return Math.max(Math.max(x, y), z);
+    }
 }
