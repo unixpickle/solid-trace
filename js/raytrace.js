@@ -40,8 +40,8 @@ class RayTracer {
                 return;
             }
             const normal = this._surfaceNormal(point);
-            const lightDirection = normalizeVector(subVector(point, ray.origin));
-            const brightness = Math.max(0, -Math.round(255 * dot(normal, lightDirection)));
+            const lightDirection = point.sub(ray.origin).normalize();
+            const brightness = Math.max(0, -Math.round(255 * normal.dot(lightDirection)));
             for (let i = 0; i < 3; i++) {
                 data.data[idx + i] = brightness;
             }
@@ -53,7 +53,7 @@ class RayTracer {
         const divider = Math.max(this.width, this.height) / 2;
         const xDist = (x - this.width / 2) / divider;
         const zDist = (y - this.height / 2) / divider;
-        return new Ray([0, this.originY, 0], [xDist, 1, zDist]);
+        return new Ray(new Vec3(0, this.originY, 0), new Vec3(xDist, 1, zDist));
     }
 
     _rayCollision(ray) {
@@ -67,8 +67,8 @@ class RayTracer {
         // ||o||^2 + *t^2 + 2*o*d*t - r^2 = 0
         // Which is a quadratic equation:
         // a=1, b=2*o*d, c=||o||^2-r^2
-        const b = 2 * dot(ray.origin, ray.direction)
-        const c = dot(ray.origin, ray.origin) - Math.pow(this.solidRadius, 2);
+        const b = 2 * ray.origin.dot(ray.direction);
+        const c = ray.origin.normSquared() - Math.pow(this.solidRadius, 2);
         if (4 * c > b * b) {
             // No collision.
             return null;
@@ -97,8 +97,8 @@ class RayTracer {
 
     _surfaceNormal(point) {
         const checkDirection = (d) => {
-            const normed = scaleVector(d, this.normalEpsilon / vectorNorm(d));
-            const p1 = addVectors(point, normed);
+            const normed = d.scale(this.normalEpsilon / d.norm());
+            const p1 = point.add(normed);
             if (!this._contains(p1)) {
                 return true;
             } else {
@@ -106,85 +106,44 @@ class RayTracer {
             }
         }
         const axes = [null, null].map(() => {
-            let v1 = randomVector();
-            let v2 = randomVector();
+            let v1 = Vec3.random();
+            let v2 = Vec3.random();
             if (!checkDirection(v1)) {
-                v1 = scaleVector(v1, -1);
+                v1 = v1.scale(-1);
             }
             if (checkDirection(v2)) {
-                v2 = scaleVector(v2, -1);
+                v2 = v2.scale(-1);
             }
             for (let i = 0; i < BISECTION_COUNT; i++) {
-                let mp = normalizeVector(addVectors(v1, v2));
+                let mp = v1.add(v2).normalize();
                 if (checkDirection(mp)) {
                     v1 = mp;
                 } else {
                     v2 = mp;
                 }
             }
-            return normalizeVector(addVectors(v1, v2));
+            return v1.add(v2).normalize();
         });
-        const res = normalizeVector(crossProduct(axes[0], axes[1]));
+        const res = axes[0].cross(axes[1]).normalize();
         if (!checkDirection(res)) {
-            return scaleVector(res, -1);
+            return res.scale(-1);
         }
         return res;
     }
 
     _contains(coord) {
-        return vectorNorm(coord) < this.solidRadius &&
-            this.solidFunc(coord[0], coord[1], coord[2]);
+        return coord.normSquared() < Math.pow(this.solidRadius, 2) &&
+            this.solidFunc(coord.x, coord.y, coord.z);
     }
 }
 
 class Ray {
     constructor(origin, direction) {
         this.origin = origin;
-        this.direction = normalizeVector(direction);
+        this.direction = direction.normalize();
     }
 
     point(t) {
-        return addVectors(this.origin, scaleVector(this.direction, t));
+        return this.origin.add(this.direction.scale(t));
     }
-}
-
-function vectorNorm(v) {
-    let res = 0;
-    v.forEach((x) => res += Math.pow(x, 2));
-    return Math.sqrt(res);
-}
-
-function scaleVector(v, s) {
-    return v.map((x) => x * s);
-}
-
-function addVectors(v1, v2) {
-    return v1.map((x, i) => x + v2[i]);
-}
-
-function subVector(v1, v2) {
-    return addVectors(v1, scaleVector(v2, -1));
-}
-
-function normalizeVector(v) {
-    return scaleVector(v, 1 / vectorNorm(v));
-}
-
-function dot(v1, v2) {
-    let res = 0;
-    v1.forEach((x, i) => res += x * v2[i]);
-    return res;
-}
-
-function randomVector() {
-    const res = [null, null, null].map(() => Math.random() * 2 - 1);
-    return normalizeVector(res);
-}
-
-function crossProduct(v, v1) {
-    return [
-        v[1] * v1[2] - v[2] * v1[1],
-        v[2] * v1[0] - v[0] * v1[2],
-        v[0] * v1[1] - v[1] * v1[0]
-    ];
 }
