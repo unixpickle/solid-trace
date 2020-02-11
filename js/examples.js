@@ -26,8 +26,10 @@ const EXAMPLE_CODES = {
 canvas.width = 400;
 canvas.height = 400;
 const ctx = canvas.getContext('2d');
-ctx.font = '400px serif';
-ctx.fillText('Hi', 10, 300);
+ctx.font = '350px serif';
+ctx.textBaseline = 'middle';
+ctx.textAlign = 'center';
+ctx.fillText('Hi', 200, 200);
 const data = ctx.getImageData(0, 0, 400, 400);
 
 (x, y, z) => {
