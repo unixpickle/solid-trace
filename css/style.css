@@ -1,0 +1,55 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+body {
+    background-color: #f0f0f0;
+}
+
+#container {
+    margin: 10px;
+}
+
+#solid-code {
+    display: block;
+    border: 1px solid #d5d5d5;
+    box-sizing: border-box;
+    resize: none;
+}
+
+#rendering {
+    display: block;
+    width: 300px;
+    height: 300px;
+}
+
+@media (max-width: 620px) {
+    #solid-code {
+        width: 100%;
+        margin: 10px 0;
+        height: 200px;
+    }
+
+    #rendering {
+        margin: 10px auto;
+    }
+}
+
+@media (min-width: 620px) {
+    #code-and-rendering::after {
+        content: ' ';
+        clear: both;
+    }
+
+    #solid-code {
+        float: right;
+        width: calc(100% - 310px);
+        height: 300px;
+    }
+
+    #rendering {
+        float: left;
+    }
+}
