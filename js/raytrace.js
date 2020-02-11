@@ -3,6 +3,7 @@ const FAST_RENDER_SUBSAMPLE = 5;
 const RENDER_INTERVAL = 30;
 const RENDER_CPU = 0.5;
 const TIME_CHECK_INTERVAL = 100;
+const AMBIENT_LIGHT = 20;
 
 class RayTracer {
     constructor(canvas, solidFunc, epsilon, normalEpsilon, originY, solidRadius) {
@@ -108,7 +109,8 @@ class RayTracer {
         }
         const normal = this._surfaceNormal(point);
         const lightDirection = point.sub(ray.origin).normalize();
-        return Math.max(0, -Math.round(255 * normal.dot(lightDirection)));
+        const rawBrightness = 255 * -normal.dot(lightDirection) + AMBIENT_LIGHT;
+        return Math.min(Math.max(0, Math.round(rawBrightness)), 255)
     }
 
     _rayCollision(ray) {
