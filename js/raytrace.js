@@ -1,4 +1,5 @@
 const BISECTION_COUNT = 32;
+const NORMAL_BISECTION_COUNT = 16;
 const FAST_RENDER_SUBSAMPLE = 5;
 const RENDER_INTERVAL = 30;
 const RENDER_CPU = 0.5;
@@ -171,7 +172,7 @@ class RayTracer {
             if (checkDirection(v2)) {
                 v2 = v2.scale(-1);
             }
-            for (let i = 0; i < BISECTION_COUNT; i++) {
+            for (let i = 0; i < NORMAL_BISECTION_COUNT; i++) {
                 let mp = v1.add(v2).normalize();
                 if (checkDirection(mp)) {
                     v1 = mp;
