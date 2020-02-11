@@ -2,6 +2,7 @@ const BISECTION_COUNT = 32;
 const FAST_RENDER_SUBSAMPLE = 5;
 const RENDER_INTERVAL = 5;
 const RENDER_CPU = 0.5;
+const TIME_CHECK_INTERVAL = 100;
 
 class RayTracer {
     constructor(canvas, solidFunc, epsilon, normalEpsilon, originY, solidRadius) {
@@ -73,8 +74,10 @@ class RayTracer {
                 pixelIdx++;
 
                 // Prevent too much blocking of the main thread.
-                if (new Date().getTime() - startTime > RENDER_INTERVAL * RENDER_CPU) {
-                    break;
+                if (pixelIdx % TIME_CHECK_INTERVAL === 0) {
+                    if (new Date().getTime() - startTime > RENDER_INTERVAL * RENDER_CPU) {
+                        break;
+                    }
                 }
             }
             if (pixelIdx === this.pixels.length) {

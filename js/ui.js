@@ -1,12 +1,12 @@
 class UserInterface {
     constructor() {
         this.solidCode = document.getElementById('solid-code');
+        this.renderButton = document.getElementById('render-button');
         this.canvas = document.getElementById('rendering');
-        this.rayTracer = null;
 
-        this.solidCode.addEventListener('change', () => {
-            this.render();
-        });
+        this.renderButton.addEventListener('click', () => this.render());
+
+        this.rayTracer = null;
     }
 
     render() {

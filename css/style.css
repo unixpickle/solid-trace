@@ -12,11 +12,43 @@ body {
     margin: 10px;
 }
 
+#code-area {
+    display: block;
+}
+
 #solid-code {
     display: block;
     border: 1px solid #d5d5d5;
+    border-bottom: none;
     box-sizing: border-box;
     resize: none;
+    width: 100%;
+    height: calc(100% - 40px);
+}
+
+#solid-code:focus {
+    outline: 0;
+}
+
+#render-button {
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    border: none;
+    background-color: #65bcd4;
+    color: white;
+    font-size: 18px;
+    margin: auto;
+    display: block;
+    cursor: pointer;
+}
+
+#render-button:focus {
+    outline: 0;
+}
+
+#render-button:hover {
+    background-color: #459cb4;
 }
 
 #rendering {
@@ -26,7 +58,7 @@ body {
 }
 
 @media (max-width: 620px) {
-    #solid-code {
+    #code-area {
         width: 100%;
         margin: 10px 0;
         height: 200px;
@@ -43,7 +75,7 @@ body {
         clear: both;
     }
 
-    #solid-code {
+    #code-area {
         float: right;
         width: calc(100% - 310px);
         height: 300px;
