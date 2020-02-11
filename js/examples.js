@@ -40,4 +40,9 @@ const data = ctx.getImageData(0, 0, 400, 400);
   const y1 = Math.floor((z + 1) * 200);
   return data.data[4 * (x1 + y1*400) + 3] > 128;
 }`,
+    'screw': `(x, y, z) => {
+  const dx = Math.cos(z*20) * 0.1;
+  const dy = Math.sin(z*20) * 0.1;
+  return Math.pow(x+dx, 2) + Math.pow(y+dy, 2) < 0.2;
+}`,
 };
