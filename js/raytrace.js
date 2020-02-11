@@ -10,7 +10,7 @@ class RayTracer {
         this.solidFunc = solidFunc;
         this.epsilon = epsilon;
         this.normalEpsilon = normalEpsilon;
-        this.originY = originY || -3;
+        this.originY = originY || -2.7;
         this.solidRadius = solidRadius || Math.sqrt(3);
 
         this.width = canvas.width;
