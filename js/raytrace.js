@@ -86,7 +86,7 @@ class RayTracer {
                 clearInterval(this.renderInterval);
             }
             ctx.putImageData(data, 0, 0);
-        }, this.renderInterval);
+        }, RENDER_INTERVAL);
     }
 
     cancel() {
