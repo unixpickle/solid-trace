@@ -6,6 +6,7 @@ class UserInterface {
         this.canvas = document.getElementById('rendering');
         this.rayTracer = null;
         this.rotationMatrix = Mat3.identity();
+        this.codeError = false;
 
         this.exampleSelect.addEventListener('change', () => this.showExample());
         this.renderButton.addEventListener('click', () => this.render());
@@ -24,9 +25,13 @@ class UserInterface {
         try {
             rawSolidFunc = eval(this.solidCode.value);
         } catch (e) {
-            alert('Failed to parse code: ' + e);
+            if (!this.codeError) {
+                alert('Failed to parse code: ' + e);
+                this.codeError = true;
+            }
             return;
         }
+        this.codeError = false;
         const solidFunc = (v) => {
             const v1 = this.rotationMatrix.transpose().apply(v);
             if (v1.maxAbs() > 1) {
