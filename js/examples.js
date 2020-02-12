@@ -36,9 +36,20 @@ const data = ctx.getImageData(0, 0, 400, 400);
   if (x < -1 || x > 1 || z < -1 || z > 1 || y > -0.5) {
     return false;
   }
-  const x1 = Math.floor((x + 1) * 200);
-  const y1 = Math.floor((z + 1) * 200);
-  return data.data[4 * (x1 + y1*400) + 3] > 128;
+  const x1 = (x + 1) * 199;
+  const y1 = (z + 1) * 199;
+  let sum = 0;
+  for (let i = 0; i < 2; i++) {
+    const x = Math.floor(x1) + i;
+    const w1 = 1 - Math.abs(x - x1);
+    for (let j = 0; j < 2; j++) {
+      const y = Math.floor(y1) + j;
+      const w2 = 1 - Math.abs(y - y1);
+      const idx = 4 * (x + y*400);
+      sum += w1*w2*data.data[idx+3];
+    }
+  }
+  return sum > 128;
 }`,
     'screw': `(x, y, z) => {
   const dx = Math.cos(z*20) * 0.1;
