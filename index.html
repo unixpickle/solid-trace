@@ -5,25 +5,63 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     </head>
     <body>
-        <div id="example-container">
+        <div id="example-container" class="pane">
             <label>Example: </label>
             <select id="example-select">
                 <option value="sphere">Sphere</option>
                 <option value="hole-box">Hole Box</option>
-                <option value="corner-cut">Corner Cut</option>
-                <option value="text" selected>Text</option>
+                <option value="corner-cut" selected>Corner Cut</option>
+                <option value="text">Text</option>
                 <option value="screw">Screw</option>
             </select>
         </div>
         <div id="container">
             <div id="code-and-rendering">
-                <div id="code-area">
-                    <textarea id="solid-code"></textarea>
+                <div id="code-area" class="pane">
+                    <textarea id="solid-code" autocorrect="off" autocapitalize="off"
+                              spellcheck="false"></textarea>
                     <button id="render-button">Render</button>
                 </div>
-                <canvas id="rendering" width="300" height="300">
+                <canvas id="rendering" width="300" height="300" class="pane">
                     Upgrade your browser if you can see this.
                 </canvas>
+            </div>
+
+            <div id="explanation" class="pane">
+                <h1>How does it work?</h1>
+                <p>
+                    This demo shows that it is possible to render a 3D object defined as nothing
+                    but a boolean function (i.e. "is this (x,y,z) coordinate in the solid?").
+                    While most algorithms for rendering operate on either triangle meshes or
+                    compositions of mathematically-defined shapes, this algorithm can work well on
+                    any function. So how exactly does it work?
+                </p>
+                <p>
+                    This demo uses <a href="https://en.wikipedia.org/wiki/Ray_casting">ray casting</a>
+                    to render each pixel of the object. In other words, for each pixel, it shoots out
+                    a ray from the camera towards the object, sees where the ray first hits the object,
+                    and uses the normal to the surface at that point to compute the brightness.
+                    It starts by rendering a low-resolution image (which can be done quickly), and
+                    then asynchronously fills in a higher-resolution version of the rendering.
+                </p>
+                <p>
+                    Ray collisions are found using a simple line search followed by a binary search.
+                    First, points along the ray are sampled every epsilon (default 0.01) distance.
+                    Once the solid returns true for some point along the ray, a binary search is
+                    conducted along the epsilon-length segment of the ray to find exactly where the
+                    ray first hits the solid.
+                </p>
+                <p>
+                    Once a point on the surface of the solid has been accurately found, a more
+                    complicated search is performed to calculate the normal to the surface.
+                    This algorithm uses two runs of a simple bisection search method to find two
+                    vectors which are tangent to the surface. It then takes the cross product of
+                    these two vectors to get a vector pointing in the direction of the normal.
+                </p>
+                <p>
+                    All of this code is
+                    <a href="https://github.com/unixpickle/solid-trace">available on GitHub</a>.
+                </p>
             </div>
 
             <script src="js/linalg.js"></script>

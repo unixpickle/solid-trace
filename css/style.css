@@ -2,15 +2,24 @@ html, body {
     margin: 0;
     padding: 0;
     width: 100%;
+    font-family: sans-serif;
 }
 
 body {
     background-color: #f0f0f0;
 }
 
+.pane {
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.3);
+}
+
 #example-container {
+    margin: 15px auto;
+    width: 300px;
+    box-sizing: border-box;
+    padding: 10px;
     text-align: center;
-    margin-top: 10px;
+    background-color: white;
 }
 
 #example-container > label {
@@ -81,6 +90,7 @@ body {
 @media (min-width: 620px) {
     #code-and-rendering::after {
         content: ' ';
+        display: block;
         clear: both;
     }
 
@@ -88,9 +98,24 @@ body {
         float: right;
         width: calc(100% - 310px);
         height: 300px;
+        margin: 0;
     }
 
     #rendering {
         float: left;
+        margin: 0;
     }
+}
+
+#explanation {
+    background-color: white;
+    margin: 20px auto;
+    padding: 10px;
+    box-sizing: border-box;
+    max-width: 600px;
+}
+
+#explanation > h1 {
+    padding: 0;
+    margin: 0;
 }
