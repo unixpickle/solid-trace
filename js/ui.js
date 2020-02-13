@@ -5,11 +5,11 @@ class UserInterface {
         this.renderButton = document.getElementById('render-button');
         this.canvas = document.getElementById('rendering');
         this.rayTracer = null;
+        this.solidFunc = (x, y, z) => false;
         this.rotationMatrix = Mat3.identity();
-        this.codeError = false;
 
         this.exampleSelect.addEventListener('change', () => this.showExample());
-        this.renderButton.addEventListener('click', () => this.render());
+        this.renderButton.addEventListener('click', () => this.updateCode());
 
         this._setupMouseEvents();
         this._setupTouchEvents();
@@ -17,27 +17,36 @@ class UserInterface {
         this.showExample();
     }
 
+    updateCode() {
+        const code = this.solidCode.value;
+        // Using Function instead of eval is more performant,
+        // since it runs code in the global scope.
+        try {
+            const solidFunc = new Function(code)();
+
+            // Do a little fuzzing to make sure the function
+            // is valid.
+            solidFunc(0, 0, 0);
+            solidFunc(0.5, -0.5, 1);
+
+            this.solidFunc = solidFunc;
+        } catch (e) {
+            alert('Code error: ' + e);
+            return;
+        }
+        this.render();
+    }
+
     render() {
         if (this.rayTracer !== null) {
             this.rayTracer.cancel();
         }
-        let rawSolidFunc;
-        try {
-            rawSolidFunc = eval(this.solidCode.value);
-        } catch (e) {
-            if (!this.codeError) {
-                alert('Failed to parse code: ' + e);
-                this.codeError = true;
-            }
-            return;
-        }
-        this.codeError = false;
         const solidFunc = (v) => {
             const v1 = this.rotationMatrix.transpose().apply(v);
             if (v1.maxAbs() > 1) {
                 return false;
             }
-            return rawSolidFunc(v1.x, v1.y, v1.z);
+            return this.solidFunc(v1.x, v1.y, v1.z);
         };
         this.rayTracer = new RayTracer(this.canvas, solidFunc, 0.01, 0.00001);
         this.rayTracer.renderFast();
@@ -47,7 +56,7 @@ class UserInterface {
     showExample() {
         const name = this.exampleSelect.value;
         this.solidCode.value = EXAMPLE_CODES[name];
-        this.render();
+        this.updateCode();
     }
 
     _setupMouseEvents() {
