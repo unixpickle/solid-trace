@@ -5,6 +5,8 @@ const RENDER_INTERVAL = 30;
 const RENDER_CPU = 0.5;
 const TIME_CHECK_INTERVAL = 100;
 const AMBIENT_LIGHT = 20;
+const FOV = Math.PI / 8;
+const DEFAULT_CAMERA_Y = -5;
 
 class RayTracer {
     constructor(canvas, solidFunc, epsilon, normalEpsilon, originY, solidRadius) {
@@ -12,7 +14,7 @@ class RayTracer {
         this.solidFunc = solidFunc;
         this.epsilon = epsilon;
         this.normalEpsilon = normalEpsilon;
-        this.originY = originY || -2.7;
+        this.originY = originY || DEFAULT_CAMERA_Y;
         this.solidRadius = solidRadius || Math.sqrt(3);
 
         this.width = canvas.width;
@@ -100,7 +102,11 @@ class RayTracer {
         const divider = Math.max(this.width, this.height) / 2;
         const xDist = (x - this.width / 2) / divider;
         const zDist = (y - this.height / 2) / divider;
-        return new Ray(new Vec3(0, this.originY, 0), new Vec3(xDist, 1, zDist));
+
+        return new Ray(
+            new Vec3(0, this.originY, 0),
+            new Vec3(xDist, 1 / Math.tan(FOV), zDist),
+        );
     }
 
     _rayBrightness(ray) {
