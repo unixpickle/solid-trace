@@ -10,17 +10,9 @@ const EXAMPLE_CODES = {
   if (Math.abs(x) > 1 || Math.abs(y) > 1 || Math.abs(z) > 1) {
     return false;
   }
-  let cutOff = false;
-  [-1, 1].forEach((cx) => {
-    [-1, 1].forEach((cy) => {
-      [-1, 1].forEach((cz) => {
-        if (Math.pow(x-cx, 2) + Math.pow(y-cy, 2) + Math.pow(z-cz, 2) < 0.4) {
-          cutOff = true;
-        }
-      });
-    });
-  });
-  return !cutOff;
+  return Math.pow(Math.abs(x)-1, 2) +
+    Math.pow(Math.abs(y)-1, 2) +
+    Math.pow(Math.abs(z)-1, 2) > 0.4;
 }`,
     'text': `const canvas = document.createElement('canvas');
 canvas.width = 400;
