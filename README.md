@@ -2,6 +2,8 @@
 
 This demo shows that it is possible to render a 3D object defined as nothing but a boolean function (i.e. "is this (x,y,z) coordinate in the solid?"). While most algorithms for rendering operate on either triangle meshes or compositions of mathematically-defined shapes, this algorithm can work well on any function.
 
+It is well-known how to efficiently render objects defined by [signed distance functions](https://en.wikipedia.org/wiki/Signed_distance_function) (SDFs), which tell you a little more information for each x,y,z (e.g. "how far is this (x,y,z) coordinate from the surface"). However, it can be difficult to implement SDFs by hand for complex shapes. The boolean functions used by this demo are simpler to implement in many cases, but require a more complex rendering algorithm.
+
 # Results
 
 Here are some rendered examples from the application:
